@@ -1,0 +1,27 @@
+  <div class="container">
+
+    <h2>Nova Vibe</h2>
+
+    <input placeholder="Música" [(ngModel)]="newVibe.musica">
+    <input placeholder="Artista" [(ngModel)]="newVibe.artista">
+    <input placeholder="Gênero" [(ngModel)]="newVibe.genero">
+    <input placeholder="Emoção" [(ngModel)]="newVibe.emocao">
+    <input type="datetime-local" [(ngModel)]="newVibe.timestamp">
+
+    <button (click)="criarVibe()">Adicionar</button>
+
+    <hr>
+
+    <h2>Listagem</h2>
+
+    <div *ngFor="let vibe of vibes">
+      <p>
+        <b>{{ vibe.musica }}</b> — {{ vibe.artista }}
+        ({{ vibe.genero }} / {{ vibe.emocao }})
+      </p>
+
+      <button (click)="deletar(vibe.id)">Deletar</button>
+      <hr>
+    </div>
+
+  </div>
