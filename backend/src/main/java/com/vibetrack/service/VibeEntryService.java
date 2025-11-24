@@ -70,7 +70,6 @@ public class VibeEntryService {
         VibeEntry existing = vibeRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("VibeEntry não encontrada: " + id));
 
-        // Trocar dono da vibe (caso userId venha diferente)
         if (userId != null && !userId.equals(existing.getUser().getId())) {
             AppUser user = userRepo.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + userId));

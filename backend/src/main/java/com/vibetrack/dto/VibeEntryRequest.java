@@ -1,4 +1,4 @@
-package com.vibetrack.controller.dto;
+package com.vibetrack.dto;
 
 import com.vibetrack.model.Emotion;
 

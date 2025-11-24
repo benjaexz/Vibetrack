@@ -2,7 +2,7 @@ package com.vibetrack.controller;
 
 import com.vibetrack.model.VibeEntry;
 import com.vibetrack.service.VibeEntryService;
-import com.vibetrack.controller.dto.VibeEntryRequest;
+import com.vibetrack.dto.VibeEntryRequest;
 import com.vibetrack.model.Emotion;
 
 import org.springframework.http.ResponseEntity;
