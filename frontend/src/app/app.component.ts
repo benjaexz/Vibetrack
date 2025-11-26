@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterOutlet } from '@angular/router';  // ← ADICIONA ESSE IMPORT
 import { VibeService } from './vibe.service';
 
 @Component({
 selector: 'app-root',
 standalone: true,
-imports: [CommonModule, FormsModule, HttpClientModule],
+imports: [CommonModule, FormsModule, HttpClientModule, RouterOutlet],  // ← ADICIONA RouterOutlet AQUI
 templateUrl: './app.component.html',
 styleUrls: ['./app.component.css'],
 })

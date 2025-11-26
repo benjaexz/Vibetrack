@@ -1,0 +1,53 @@
+<div class="dashboard-container">
+
+  <header class="dashboard-header">
+    <h1>🎵 Dashboard - Vibetrack</h1>
+    <p>Seus padrões musicais e emocionais</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando estatísticas...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <p>⚠️ {{ error }}</p>
+    <button (click)="loadAllStats()">Tentar novamente</button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error" class="dashboard-content">
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+
+      <!-- Emotion Chart -->
+      <div class="chart-card">
+        <h3>Emoções</h3>
+        <canvas id="emotionChart"></canvas>
+      </div>
+
+      <!-- Genres Chart -->
+      <div class="chart-card">
+        <h3>Top Gêneros</h3>
+        <canvas id="genresChart"></canvas>
+      </div>
+
+      <!-- Timeline Chart -->
+      <div class="chart-card chart-wide">
+        <h3>Timeline (últimos 7 dias)</h3>
+        <canvas id="timelineChart"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Top Artists -->
+    <div class="artists-section">
+      <h3>🎤 Top Artistas</h3>
+      <div class="artists-list">
+        <div *ngFor="let artist of topArtists; let i = index" class="artist-item">
+          <span class="artist-rank">{{ i + 1 }}</span>
+          <span class="artist-name">{{ artist.name }}</span>
+          <span class="artist-count">{{ artist.count }}
