@@ -3,100 +3,89 @@ package com.vibetrack.service;
 import com.vibetrack.dto.EmotionStatsDTO;
 import com.vibetrack.dto.TimelineEntryDTO;
 import com.vibetrack.dto.TopItemDTO;
+import com.vibetrack.model.AppUser;
 import com.vibetrack.model.Emotion;
 import com.vibetrack.model.VibeEntry;
+import com.vibetrack.repository.UserRepository;
 import com.vibetrack.repository.VibeEntryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
 
-    @Autowired
-    private VibeEntryRepository vibeEntryRepository;
+    private final VibeEntryRepository vibeRepo;
+    private final UserRepository userRepo;
 
-    // Retorna estatísticas de emoções
-    public List<EmotionStatsDTO> getEmotionStats() {
-        List<Object[]> results = vibeEntryRepository.countByEmotion();
-        List<EmotionStatsDTO> stats = new ArrayList<>();
-
-        for (Object[] result : results) {
-            Emotion emotion = (Emotion) result[0];
-            Long count = (Long) result[1];
-            stats.add(new EmotionStatsDTO(emotion, count));
-        }
-
-        return stats;
+    public StatsService(VibeEntryRepository vibeRepo, UserRepository userRepo) {
+        this.vibeRepo = vibeRepo;
+        this.userRepo = userRepo;
     }
 
-    // Retorna top N gêneros
-    public List<TopItemDTO> getTopGenres(int limit) {
-        List<Object[]> results = vibeEntryRepository.findTopGenres();
-        List<TopItemDTO> topGenres = new ArrayList<>();
-
-        int count = 0;
-        for (Object[] result : results) {
-            if (count >= limit) break;
-            String name = (String) result[0];
-            Long total = (Long) result[1];
-            topGenres.add(new TopItemDTO(name, total));
-            count++;
-        }
-
-        return topGenres;
+    private AppUser getUser(Long userId) {
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
-    // Retorna top N artistas
-    public List<TopItemDTO> getTopArtists(int limit) {
-        List<Object[]> results = vibeEntryRepository.findTopArtists();
-        List<TopItemDTO> topArtists = new ArrayList<>();
+    // Timeline diária — contagem de entradas por dia
+    public List<TimelineEntryDTO> getTimeline(Long userId) {
+        AppUser user = getUser(userId);
 
-        int count = 0;
-        for (Object[] result : results) {
-            if (count >= limit) break;
-            String name = (String) result[0];
-            Long total = (Long) result[1];
-            topArtists.add(new TopItemDTO(name, total));
-            count++;
-        }
+        List<VibeEntry> vibes = vibeRepo.findByUserOrderByTimestampDesc(user);
 
-        return topArtists;
+        Map<LocalDate, Long> counts = vibes.stream()
+                .collect(Collectors.groupingBy(
+                        v -> v.getTimestamp().atZone(ZoneOffset.UTC).toLocalDate(),
+                        Collectors.counting()
+                ));
+
+        return counts.entrySet().stream()
+                .map(e -> new TimelineEntryDTO(e.getKey(), e.getValue()))
+                .sorted(Comparator.comparing(TimelineEntryDTO::getDate))
+                .toList();
     }
 
-    // Retorna timeline dos últimos N dias
-    public List<TimelineEntryDTO> getTimeline(int days) {
-        Instant startDate = Instant.now().minus(days, ChronoUnit.DAYS);
-        List<VibeEntry> vibes = vibeEntryRepository.findVibesAfterDate(startDate);
+    // Top artistas ou gêneros
+    public List<TopItemDTO> getTop(Long userId, String field) {
+        AppUser user = getUser(userId);
 
-        // Agrupar por data
-        Map<LocalDate, Long> dateCountMap = new HashMap<>();
+        List<VibeEntry> vibes = vibeRepo.findByUserOrderByTimestampDesc(user);
 
-        for (VibeEntry vibe : vibes) {
-            LocalDate date = vibe.getTimestamp()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-            dateCountMap.put(date, dateCountMap.getOrDefault(date, 0L) + 1);
+        Map<String, Long> counts = new HashMap<>();
+
+        for (VibeEntry v : vibes) {
+            String key = field.equals("artista") ? v.getArtista() : v.getGenero();
+            if (key != null) counts.merge(key, 1L, Long::sum);
         }
 
-        // Converter para lista de DTOs
-        List<TimelineEntryDTO> timeline = new ArrayList<>();
-        for (Map.Entry<LocalDate, Long> entry : dateCountMap.entrySet()) {
-            timeline.add(new TimelineEntryDTO(entry.getKey(), entry.getValue()));
+        return counts.entrySet().stream()
+                .map(e -> new TopItemDTO(e.getKey(), e.getValue()))
+                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
+                .limit(10)
+                .toList();
+    }
+
+    // Estatísticas de emoções
+    public List<EmotionStatsDTO> getEmotionStats(Long userId) {
+        AppUser user = getUser(userId);
+
+        List<VibeEntry> vibes = vibeRepo.findByUserOrderByTimestampDesc(user);
+
+        Map<Emotion, Long> counts = Arrays.stream(Emotion.values())
+                .collect(Collectors.toMap(e -> e, e -> 0L));
+
+        for (VibeEntry v : vibes) {
+            counts.merge(v.getEmocao(), 1L, Long::sum);
         }
 
-        // Ordenar por data
-        timeline.sort((a, b) -> a.getDate().compareTo(b.getDate()));
-
-        return timeline;
+        return counts.entrySet().stream()
+                .map(e -> new EmotionStatsDTO(e.getKey(), e.getValue()))
+                .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
+                .toList();
     }
 }

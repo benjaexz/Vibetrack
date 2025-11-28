@@ -1,72 +1,51 @@
 package com.vibetrack.controller;
 
-import com.vibetrack.model.VibeEntry;
-import com.vibetrack.service.VibeEntryService;
 import com.vibetrack.dto.VibeEntryRequest;
-import com.vibetrack.model.Emotion;
-
+import com.vibetrack.dto.VibeEntryResponse;
+import com.vibetrack.model.AppUser;
+import com.vibetrack.service.UserService;
+import com.vibetrack.service.VibeEntryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/vibes")
-@CrossOrigin(origins = "http://localhost:4200") // mantém consistência com seu front
+@RequestMapping("/api/v1/vibes")
 public class VibeEntryController {
 
-    private final VibeEntryService service;
+    private final VibeEntryService vibeEntryService;
+    private final UserService userService;
 
-    public VibeEntryController(VibeEntryService service) {
-        this.service = service;
+    public VibeEntryController(VibeEntryService vibeEntryService, UserService userService) {
+        this.vibeEntryService = vibeEntryService;
+        this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<VibeEntry> create(@RequestBody VibeEntryRequest req) {
-        Instant ts = req.timestamp == null ? null : Instant.parse(req.timestamp);
-        VibeEntry created = service.createVibe(req.userId, req.musica, req.artista, req.genero, req.emocao == null ? Emotion.NEUTRAL : req.emocao, ts);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<VibeEntryResponse> create(
+            @AuthenticationPrincipal AppUser authUser,
+            @RequestBody VibeEntryRequest request
+    ) {
+        VibeEntryResponse response = vibeEntryService.create(authUser.getId(), request);
+        return ResponseEntity.ok(response);
     }
 
-
-
     @GetMapping
-    public ResponseEntity<List<VibeEntry>> list(@RequestParam(required = false) Long userId) {
-        List<VibeEntry> list = (userId == null) ? service.listAll() : service.listByUser(userId);
+    public ResponseEntity<List<VibeEntryResponse>> listByUser(
+            @AuthenticationPrincipal AppUser authUser
+    ) {
+        List<VibeEntryResponse> list = vibeEntryService.findAllByUser(authUser.getId());
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<VibeEntry> get(@PathVariable Long id) {
-        return service.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser authUser,
+            @PathVariable Long id
+    ) {
+        vibeEntryService.delete(id, authUser.getId());
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<VibeEntry> update(
-            @PathVariable Long id,
-            @RequestBody VibeEntryRequest req
-    ) {
-        VibeEntry updated = service.updateVibe(
-                id,
-                req.userId,
-                req.musica,
-                req.artista,
-                req.genero,
-                req.emocao,
-                req.timestamp == null ? null : Instant.parse(req.timestamp)
-        );
-
-        return ResponseEntity.ok(updated);
-    }
-
 }

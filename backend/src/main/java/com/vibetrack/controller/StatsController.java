@@ -4,46 +4,42 @@ import com.vibetrack.dto.EmotionStatsDTO;
 import com.vibetrack.dto.TimelineEntryDTO;
 import com.vibetrack.dto.TopItemDTO;
 import com.vibetrack.service.StatsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/stats")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class StatsController {
 
-    @Autowired
-    private StatsService statsService;
+    private final StatsService statsService;
 
-    // GET /api/stats/emotions - Estatísticas por emoção
-    @GetMapping("/emotions")
-    public ResponseEntity<List<EmotionStatsDTO>> getEmotionStats() {
-        List<EmotionStatsDTO> stats = statsService.getEmotionStats();
-        return ResponseEntity.ok(stats);
+    public StatsController(StatsService statsService) {
+        this.statsService = statsService;
     }
 
-    // GET /api/stats/genres - Top 3 gêneros
-    @GetMapping("/genres")
-    public ResponseEntity<List<TopItemDTO>> getTopGenres() {
-        List<TopItemDTO> topGenres = statsService.getTopGenres(3);
-        return ResponseEntity.ok(topGenres);
+    // Timeline de emoções por dia
+    @GetMapping("/timeline/{userId}")
+    public List<TimelineEntryDTO> getTimeline(@PathVariable Long userId) {
+        return statsService.getTimeline(userId);
     }
 
-    // GET /api/stats/artists - Top 3 artistas
-    @GetMapping("/artists")
-    public ResponseEntity<List<TopItemDTO>> getTopArtists() {
-        List<TopItemDTO> topArtists = statsService.getTopArtists(3);
-        return ResponseEntity.ok(topArtists);
+    // Top gêneros
+    @GetMapping("/top/generos/{userId}")
+    public List<TopItemDTO> getTopGeneros(@PathVariable Long userId) {
+        return statsService.getTop(userId, "genero");
     }
 
-    // GET /api/stats/timeline?days=7 - Timeline dos últimos N dias
-    @GetMapping("/timeline")
-    public ResponseEntity<List<TimelineEntryDTO>> getTimeline(
-            @RequestParam(defaultValue = "7") int days) {
-        List<TimelineEntryDTO> timeline = statsService.getTimeline(days);
-        return ResponseEntity.ok(timeline);
+    // Top artistas
+    @GetMapping("/top/artistas/{userId}")
+    public List<TopItemDTO> getTopArtistas(@PathVariable Long userId) {
+        return statsService.getTop(userId, "artista");
+    }
+
+    // Estatísticas de emoções
+    @GetMapping("/emocoes/{userId}")
+    public List<EmotionStatsDTO> getEmotionStats(@PathVariable Long userId) {
+        return statsService.getEmotionStats(userId);
     }
 }
