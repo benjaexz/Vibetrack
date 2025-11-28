@@ -1,12 +1,14 @@
 package com.vibetrack.controller;
 
+import com.vibetrack.dto.ApiResponse;
 import com.vibetrack.dto.VibeEntryRequest;
 import com.vibetrack.dto.VibeEntryResponse;
 import com.vibetrack.model.AppUser;
 import com.vibetrack.service.UserService;
 import com.vibetrack.service.VibeEntryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,29 +25,39 @@ public class VibeEntryController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<VibeEntryResponse> create(
-            @AuthenticationPrincipal AppUser authUser,
-            @RequestBody VibeEntryRequest request
-    ) {
-        VibeEntryResponse response = vibeEntryService.create(authUser.getId(), request);
-        return ResponseEntity.ok(response);
+    private AppUser getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return userService.findByEmail(email);
     }
 
-    @GetMapping
-    public ResponseEntity<List<VibeEntryResponse>> listByUser(
-            @AuthenticationPrincipal AppUser authUser
-    ) {
-        List<VibeEntryResponse> list = vibeEntryService.findAllByUser(authUser.getId());
-        return ResponseEntity.ok(list);
+    @PostMapping
+    public ResponseEntity<ApiResponse<VibeEntryResponse>> create(@RequestBody VibeEntryRequest request) {
+        AppUser user = getAuthenticatedUser();
+        VibeEntryResponse response = vibeEntryService.create(request, user);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Vibe registrada.", response)
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<VibeEntryResponse>>> listMyVibes() {
+        AppUser user = getAuthenticatedUser();
+        List<VibeEntryResponse> list = vibeEntryService.findAllByUser(user);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Listagem feita.", list)
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal AppUser authUser,
-            @PathVariable Long id
-    ) {
-        vibeEntryService.delete(id, authUser.getId());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+        AppUser user = getAuthenticatedUser();
+        vibeEntryService.delete(id, user);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Deletado.", null)
+        );
     }
 }
