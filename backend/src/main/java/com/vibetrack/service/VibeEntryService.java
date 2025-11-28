@@ -1,9 +1,7 @@
 package com.vibetrack.service;
 
-import com.vibetrack.dto.VibeEntryRequest;
-import com.vibetrack.dto.VibeEntryResponse;
-import com.vibetrack.model.AppUser;
-import com.vibetrack.model.VibeEntry;
+import com.vibetrack.entity.AppUser;
+import com.vibetrack.entity.VibeEntry;
 import com.vibetrack.repository.VibeEntryRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,62 +11,25 @@ import java.util.List;
 @Service
 public class VibeEntryService {
 
-    private final VibeEntryRepository repository;
+    private final VibeEntryRepository vibeEntryRepository;
 
-    public VibeEntryService(VibeEntryRepository repository) {
-        this.repository = repository;
+    public VibeEntryService(VibeEntryRepository vibeEntryRepository) {
+        this.vibeEntryRepository = vibeEntryRepository;
     }
 
-    public VibeEntryResponse create(VibeEntryRequest request, AppUser user) {
-        VibeEntry entry = new VibeEntry();
-
-        entry.setUser(user);
-        entry.setMusica(request.musica());
-        entry.setArtista(request.artista());
-        entry.setGenero(request.genero());
-        entry.setEmocao(request.emocao());
-        entry.setTimestamp(
-                request.timestamp() != null
-                        ? Instant.parse(request.timestamp())
-                        : Instant.now()
-        );
-
-        repository.save(entry);
-
-        return new VibeEntryResponse(
-                entry.getId(),
-                entry.getMusica(),
-                entry.getArtista(),
-                entry.getGenero(),
-                entry.getEmocao(),
-                entry.getTimestamp(),
-                user.getId()
-        );
+    public VibeEntry save(VibeEntry vibeEntry) {
+        return vibeEntryRepository.save(vibeEntry);
     }
 
-    public List<VibeEntryResponse> findAllByUser(AppUser user) {
-        return repository.findByUserOrderByTimestampDesc(user)
-                .stream()
-                .map(v -> new VibeEntryResponse(
-                        v.getId(),
-                        v.getMusica(),
-                        v.getArtista(),
-                        v.getGenero(),
-                        v.getEmocao(),
-                        v.getTimestamp(),
-                        user.getId()
-                ))
-                .toList();
+    public List<VibeEntry> getAllByUserId(Long userId) {
+        return vibeEntryRepository.findByUserId(userId);
     }
 
-    public void delete(Long id, AppUser user) {
-        VibeEntry entry = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vibe não encontrada."));
+    public List<VibeEntry> getAllByUser(AppUser user) {
+        return vibeEntryRepository.findByUserOrderByTimestampDesc(user);
+    }
 
-        if (!entry.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Não autorizado.");
-        }
-
-        repository.delete(entry);
+    public List<VibeEntry> getByUserAndTimeRange(AppUser user, Instant start, Instant end) {
+        return vibeEntryRepository.findByUserAndTimestampBetween(user, start, end);
     }
 }
