@@ -1,23 +1,81 @@
-package com.vibetrack.controller;
+package com.vibetrack.service;
 
 import com.vibetrack.dto.UserStatsDTO;
-import com.vibetrack.service.VibeEntryService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.vibetrack.entity.AppUser;
+import com.vibetrack.entity.VibeEntry;
+import com.vibetrack.repository.UserRepository;
+import com.vibetrack.repository.VibeEntryRepository;
+import com.vibetrack.repository.VibeStatsRepository;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/api/v1/stats")
-public class VibeStatsController {
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-    private final VibeEntryService vibeEntryService;
+@Service
+public class VibeEntryService {
 
-    public VibeStatsController(VibeEntryService vibeEntryService) {
-        this.vibeEntryService = vibeEntryService;
+    private final VibeEntryRepository vibeEntryRepository;
+    private final VibeStatsRepository vibeStatsRepository;
+    private final UserRepository userRepository;
+
+    public VibeEntryService(
+            VibeEntryRepository vibeEntryRepository,
+            VibeStatsRepository vibeStatsRepository,
+            UserRepository userRepository
+    ) {
+        this.vibeEntryRepository = vibeEntryRepository;
+        this.vibeStatsRepository = vibeStatsRepository;
+        this.userRepository = userRepository;
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<UserStatsDTO> getStats(@PathVariable Long userId) {
-        UserStatsDTO stats = vibeEntryService.getUserStats(userId);
-        return ResponseEntity.ok(stats);
+    // --------------------------------------------
+    // CRUD Básico
+    // --------------------------------------------
+    public VibeEntry save(VibeEntry vibeEntry) {
+        return vibeEntryRepository.save(vibeEntry);
     }
-}
+
+    public List<VibeEntry> getAllByUserId(Long userId) {
+        return vibeEntryRepository.findByUserId(userId);
+    }
+
+    public List<VibeEntry> getAllByUser(AppUser user) {
+        return vibeEntryRepository.findByUserOrderByTimestampDesc(user);
+    }
+
+    public List<VibeEntry> getByUserAndTimeRange(AppUser user, Instant start, Instant end) {
+        return vibeEntryRepository.findByUserAndTimestampBetween(user, start, end);
+    }
+
+    // --------------------------------------------
+    // ESTATÍSTICAS
+    // --------------------------------------------
+    public UserStatsDTO getUserStats(Long userId) {
+
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        // 1) Emoções
+        List<Object[]> emotionRaw = vibeStatsRepository.countByEmotion(userId);
+
+        Map<String, Long> emotionCount = emotionRaw.stream()
+                .collect(Collectors.toMap(
+                        row -> row[0].toString(),
+                        row -> (Long) row[1]
+                ));
+
+        // 2) Gêneros
+        List<Object[]> generoRaw = vibeStatsRepository.topGeneros(userId);
+
+        Map<String, Long> generos = generoRaw.stream()
+                .collect(Collectors.toMap(
+                        row -> row[0].toString(),
+                        row -> (Long) row[1]
+                ));
+
+        // 3) Artistas
+        List<Object[]> artistasRaw = vibeStatsRepository.topArtistas(userId);
+
+        Map<String, Long> artistas = artistasRaw.stream()

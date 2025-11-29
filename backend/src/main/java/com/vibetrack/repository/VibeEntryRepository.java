@@ -1,7 +1,7 @@
 package com.vibetrack.repository;
 
-import com.vibetrack.model.AppUser;
-import com.vibetrack.model.VibeEntry;
+import com.vibetrack.entity.AppUser;
+import com.vibetrack.entity.VibeEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
@@ -9,13 +9,15 @@ import java.util.List;
 
 public interface VibeEntryRepository extends JpaRepository<VibeEntry, Long> {
 
-    // Buscar vibes por userId simples
+    // Buscar vibes por ID do usuário (versão simples)
     List<VibeEntry> findByUserId(Long userId);
 
-    // Buscar todas as vibes de um usuário (ordenadas)
+    // Buscar vibes do usuário ordenadas por data desc
     List<VibeEntry> findByUserOrderByTimestampDesc(AppUser user);
 
-    // Buscar vibes por intervalo de tempo (para relatórios)
+    // Buscar vibes dentro de um intervalo de tempo
     List<VibeEntry> findByUserAndTimestampBetween(AppUser user, Instant start, Instant end);
 
+    // Contar todas as vibes do usuário
+    long countByUser(AppUser user);
 }
