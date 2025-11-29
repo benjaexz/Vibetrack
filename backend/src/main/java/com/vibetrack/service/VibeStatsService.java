@@ -1,65 +1,60 @@
 package com.vibetrack.service;
 
-import com.vibetrack.dto.TimelineEntryDTO;
-import com.vibetrack.dto.TopItemDTO;
-import com.vibetrack.model.Emotion;
+import com.vibetrack.dto.stats.EmotionCountResponse;
+import com.vibetrack.dto.stats.TopArtistResponse;
+import com.vibetrack.dto.stats.TopGenreResponse;
+import com.vibetrack.dto.stats.TimelinePointResponse;
 import com.vibetrack.repository.VibeStatsRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VibeStatsService {
 
-    private final VibeStatsRepository statsRepository;
+    private final VibeStatsRepository vibeStatsRepository;
 
-    public VibeStatsService(VibeStatsRepository statsRepository) {
-        this.statsRepository = statsRepository;
+    public VibeStatsService(VibeStatsRepository vibeStatsRepository) {
+        this.vibeStatsRepository = vibeStatsRepository;
     }
 
-    // Emoções mais registradas
-    public List<TopItemDTO> countByEmotion(Long userId) {
-        return statsRepository.countByEmotion(userId)
+    // Estatísticas por emoção
+    public List<EmotionCountResponse> countByEmotion(Long userId) {
+        return vibeStatsRepository.countByEmotion(userId)
                 .stream()
-                .map(obj -> new TopItemDTO(
-                        ((Emotion) obj[0]).name(),
-                        (Long) obj[1]
-                ))
-                .collect(Collectors.toList());
+                .map(row -> new EmotionCountResponse(
+                        (com.vibetrack.model.Emotion) row[0],
+                        ((Number) row[1]).longValue()
+                )).toList();
     }
 
-    // Gêneros mais comuns
-    public List<TopItemDTO> topGeneros(Long userId) {
-        return statsRepository.topGeneros(userId)
+    // Top gêneros
+    public List<TopGenreResponse> topGeneros(Long userId) {
+        return vibeStatsRepository.topGeneros(userId)
                 .stream()
-                .map(obj -> new TopItemDTO(
-                        (String) obj[0],
-                        (Long) obj[1]
-                ))
-                .collect(Collectors.toList());
+                .map(row -> new TopGenreResponse(
+                        (String) row[0],
+                        ((Number) row[1]).longValue()
+                )).toList();
     }
 
-    // Artistas mais comuns
-    public List<TopItemDTO> topArtistas(Long userId) {
-        return statsRepository.topArtistas(userId)
+    // Top artistas
+    public List<TopArtistResponse> topArtistas(Long userId) {
+        return vibeStatsRepository.topArtistas(userId)
                 .stream()
-                .map(obj -> new TopItemDTO(
-                        (String) obj[0],
-                        (Long) obj[1]
-                ))
-                .collect(Collectors.toList());
+                .map(row -> new TopArtistResponse(
+                        (String) row[0],
+                        ((Number) row[1]).longValue()
+                )).toList();
     }
 
-    // Timeline (registros por dia)
-    public List<TimelineEntryDTO> timeline(Long userId) {
-        return statsRepository.timeline(userId)
+    // Timeline diária
+    public List<TimelinePointResponse> timeline(Long userId) {
+        return vibeStatsRepository.timeline(userId)
                 .stream()
-                .map(obj -> new TimelineEntryDTO(
-                        (LocalDate) obj[0],
-                        (Long) obj[1]
-                ))
-                .collect(Collectors.toList());
+                .map(row -> new TimelinePointResponse(
+                        row[0].toString(),
+                        ((Number) row[1]).longValue()
+                )).toList();
     }
 }

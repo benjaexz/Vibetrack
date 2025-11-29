@@ -1,16 +1,13 @@
 package com.vibetrack.controller;
 
-import com.vibetrack.dto.EmotionStatsDTO;
-import com.vibetrack.dto.TimelineEntryDTO;
-import com.vibetrack.dto.TopItemDTO;
 import com.vibetrack.service.StatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/stats")
+@RequestMapping("/stats")
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
@@ -19,23 +16,23 @@ public class StatisticsController {
         this.statisticsService = statisticsService;
     }
 
-    @GetMapping("/emotions/{userId}")
-    public ResponseEntity<List<EmotionStatsDTO>> getEmotionStats(@PathVariable Long userId) {
+    @GetMapping("/emocao/{userId}")
+    public ResponseEntity<Map<String, Long>> emocao(@PathVariable Long userId) {
         return ResponseEntity.ok(statisticsService.countByEmotion(userId));
     }
 
+    @GetMapping("/artistas/{userId}")
+    public ResponseEntity<Map<String, Long>> artistas(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.topArtistas(userId));
+    }
+
+    @GetMapping("/generos/{userId}")
+    public ResponseEntity<Map<String, Long>> generos(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.topGeneros(userId));
+    }
+
     @GetMapping("/timeline/{userId}")
-    public ResponseEntity<List<TimelineEntryDTO>> getTimeline(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, Long>> timeline(@PathVariable Long userId) {
         return ResponseEntity.ok(statisticsService.timeline(userId));
-    }
-
-    @GetMapping("/top-artists/{userId}")
-    public ResponseEntity<List<TopItemDTO>> getTopArtists(@PathVariable Long userId) {
-        return ResponseEntity.ok(statisticsService.topArtists(userId));
-    }
-
-    @GetMapping("/top-genres/{userId}")
-    public ResponseEntity<List<TopItemDTO>> getTopGenres(@PathVariable Long userId) {
-        return ResponseEntity.ok(statisticsService.topGenres(userId));
     }
 }
