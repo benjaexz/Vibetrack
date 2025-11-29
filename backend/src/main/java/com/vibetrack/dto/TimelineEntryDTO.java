@@ -7,30 +7,16 @@ public class TimelineEntryDTO {
     private LocalDate date;
     private Long count;
 
-    // Construtor vazio
-    public TimelineEntryDTO() {
-    }
+    public TimelineEntryDTO() {}
 
-    // Construtor com parâmetros
     public TimelineEntryDTO(LocalDate date, Long count) {
         this.date = date;
         this.count = count;
     }
 
-    // Getters e Setters
-    public LocalDate getDate() {
-        return date;
-    }
+    public LocalDate getDate() { return date; }
+    public Long getCount() { return count; }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public Long getCount() {
-        return count;
-    }
-
-    public void setCount(Long count) {
-        this.count = count;
-    }
+    public void setDate(LocalDate date) { this.date = date; }
+    public void setCount(Long count) { this.count = count; }
 }

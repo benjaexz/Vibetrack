@@ -1,39 +1,23 @@
 package com.vibetrack.controller;
 
-import com.vibetrack.dto.TimelineEntryDTO;
-import com.vibetrack.dto.TopItemDTO;
-import com.vibetrack.service.VibeStatsService;
+import com.vibetrack.dto.UserStatsDTO;
+import com.vibetrack.service.VibeEntryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/vibes/stats")
+@RequestMapping("/api/v1/stats")
 public class VibeStatsController {
 
-    private final VibeStatsService statsService;
+    private final VibeEntryService vibeEntryService;
 
-    public VibeStatsController(VibeStatsService statsService) {
-        this.statsService = statsService;
+    public VibeStatsController(VibeEntryService vibeEntryService) {
+        this.vibeEntryService = vibeEntryService;
     }
 
-    @GetMapping("/emotions/{userId}")
-    public List<TopItemDTO> countByEmotion(@PathVariable Long userId) {
-        return statsService.countByEmotion(userId);
-    }
-
-    @GetMapping("/genres/{userId}")
-    public List<TopItemDTO> topGeneros(@PathVariable Long userId) {
-        return statsService.topGeneros(userId);
-    }
-
-    @GetMapping("/artists/{userId}")
-    public List<TopItemDTO> topArtistas(@PathVariable Long userId) {
-        return statsService.topArtistas(userId);
-    }
-
-    @GetMapping("/timeline/{userId}")
-    public List<TimelineEntryDTO> timeline(@PathVariable Long userId) {
-        return statsService.timeline(userId);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserStatsDTO> getStats(@PathVariable Long userId) {
+        UserStatsDTO stats = vibeEntryService.getUserStats(userId);
+        return ResponseEntity.ok(stats);
     }
 }
