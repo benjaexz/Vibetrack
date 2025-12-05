@@ -1,4 +1,4 @@
-package com.vibetrack.security;
+fffxddghgfdpackage com.vibetrack.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
