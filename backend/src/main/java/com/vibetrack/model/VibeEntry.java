@@ -19,29 +19,29 @@ public class VibeEntry {
     private AppUser user;
 
     @NotBlank
-    private String musica;
+    private String songTitle;
 
     @NotBlank
-    private String artista;
+    private String artist;
 
     @NotBlank
-    private String genero;
+    private String genre;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private Emotion emocao;
+    private Emotion emotion;
 
     @NotNull
     private Instant timestamp;
 
     public VibeEntry() {}
 
-    public VibeEntry(AppUser user, String musica, String artista, String genero, Emotion emocao, Instant timestamp) {
+    public VibeEntry(AppUser user, String songTitle, String artist, String genre, Emotion emotion, Instant timestamp) {
         this.user = user;
-        this.musica = musica;
-        this.artista = artista;
-        this.genero = genero;
-        this.emocao = emocao;
+        this.songTitle = songTitle;
+        this.artist = artist;
+        this.genre = genre;
+        this.emotion = emotion;
         this.timestamp = timestamp;
     }
 
@@ -57,36 +57,36 @@ public class VibeEntry {
         this.user = user;
     }
 
-    public String getMusica() {
-        return musica;
+    public String getSongTitle() {
+        return songTitle;
     }
 
-    public void setMusica(String musica) {
-        this.musica = musica;
+    public void setSongTitle(String songTitle) {
+        this.songTitle = songTitle;
     }
 
-    public String getArtista() {
-        return artista;
+    public String getArtist() {
+        return artist;
     }
 
-    public void setArtista(String artista) {
-        this.artista = artista;
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
-    public String getGenero() {
-        return genero;
+    public String getGenre() {
+        return genre;
     }
 
-    public void setGenero(String genero) {
-        this.genero = genero;
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
-    public Emotion getEmocao() {
-        return emocao;
+    public Emotion getEmotion() {
+        return emotion;
     }
 
-    public void setEmocao(Emotion emocao) {
-        this.emocao = emocao;
+    public void setEmotion(Emotion emotion) {
+        this.emotion = emotion;
     }
 
     public Instant getTimestamp() {
