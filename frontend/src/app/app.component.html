@@ -1,33 +1,19 @@
-<nav>
-  <a routerLink="/dashboard">Dashboard</a>
-  <a routerLink="/vibes">Vibes</a>
-</nav>
+<div class="login-container">
+  <h2>Login</h2>
 
-<router-outlet></router-outlet>
-  <div class="container">
+  <form (ngSubmit)="onLogin()">
+    <label>
+      Username:
+      <input type="text" [(ngModel)]="username" name="username" required />
+    </label>
 
-    <h2>Nova Vibe</h2>
+    <label>
+      Password:
+      <input type="password" [(ngModel)]="password" name="password" required />
+    </label>
 
-    <input placeholder="Música" [(ngModel)]="newVibe.musica">
-    <input placeholder="Artista" [(ngModel)]="newVibe.artista">
-    <input placeholder="Gênero" [(ngModel)]="newVibe.genero">
-    <input placeholder="Emoção" [(ngModel)]="newVibe.emocao">
-    <input type="datetime-local" [(ngModel)]="newVibe.timestamp">
+    <button type="submit">Entrar</button>
+  </form>
 
-    <button (click)="criarVibe()">Adicionar</button>
-
-    <hr>
-
-    <h2>Listagem</h2>
-
-    <div *ngFor="let vibe of vibes">
-      <p>
-        <b>{{ vibe.musica }}</b> — {{ vibe.artista }}
-        ({{ vibe.genero }} / {{ vibe.emocao }})
-      </p>
-
-      <button (click)="deletar(vibe.id)">Deletar</button>
-      <hr>
-    </div>
-
-  </div>
+  <p *ngIf="message">{{ message }}</p>
+</div>
