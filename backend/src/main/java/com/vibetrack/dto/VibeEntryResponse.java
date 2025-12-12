@@ -7,32 +7,57 @@ import java.time.Instant;
 public class VibeEntryResponse {
 
     private Long id;
-    private String musica;
-    private String artista;
-    private String genero;
-    private Emotion emocao;
+    private String music;
+    private String artist;
+    private String genre;
+    private Emotion emotion;
     private Instant timestamp;
 
-    public VibeEntryResponse() {}
-
-    public VibeEntryResponse(Long id, String musica, String artista, String genero, Emotion emocao, Instant timestamp) {
-        this.id = id;
-        this.musica = musica;
-        this.artista = artista;
-        this.genero = genero;
-        this.emocao = emocao;
-        this.timestamp = timestamp;
+    public Long getId() {
+        return id;
     }
 
-    public Long getId() { return id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getMusica() { return musica; }
+    public String getMusic() {
+        return music;
+    }
 
-    public String getArtista() { return artista; }
+    public void setMusic(String music) {
+        this.music = music;
+    }
 
-    public String getGenero() { return genero; }
+    public String getArtist() {
+        return artist;
+    }
 
-    public Emotion getEmocao() { return emocao; }
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
 
-    public Instant getTimestamp() { return timestamp; }
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public Emotion getEmotion() {
+        return emotion;
+    }
+
+    public void setEmotion(Emotion emotion) {
+        this.emotion = emotion;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
 }

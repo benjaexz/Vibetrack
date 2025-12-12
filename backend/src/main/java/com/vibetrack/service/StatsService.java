@@ -29,7 +29,7 @@ public class StatsService {
     }
 
     public List<TopItemDTO> getTopGeneros(Long userId) {
-        return repo.topGeneros(userId).stream()
+        return repo.topGenres(userId).stream()
                 .map(row -> new TopItemDTO(
                         (String) row[0],
                         (Long) row[1]
@@ -38,7 +38,7 @@ public class StatsService {
     }
 
     public List<TopItemDTO> getTopArtistas(Long userId) {
-        return repo.topArtistas(userId).stream()
+        return repo.topArtists(userId).stream()
                 .map(row -> new TopItemDTO(
                         (String) row[0],
                         (Long) row[1]

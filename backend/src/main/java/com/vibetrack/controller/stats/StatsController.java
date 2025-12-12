@@ -1,42 +1,39 @@
 package com.vibetrack.controller.stats;
 
-import com.vibetrack.dto.stats.EmotionCountResponse;
-import com.vibetrack.dto.stats.TopArtistResponse;
-import com.vibetrack.dto.stats.TopGenreResponse;
-import com.vibetrack.dto.stats.TimelinePointResponse;
-import com.vibetrack.service.VibeStatsService;
+import com.vibetrack.service.StatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/stats")
 public class StatsController {
 
-    private final VibeStatsService vibeStatsService;
+    private final StatisticsService statisticsService;
 
-    public StatsController(VibeStatsService vibeStatsService) {
-        this.vibeStatsService = vibeStatsService;
+    public StatsController(StatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
     }
 
     @GetMapping("/{userId}/emotions")
-    public ResponseEntity<List<EmotionCountResponse>> emotionStats(@PathVariable Long userId) {
-        return ResponseEntity.ok(vibeStatsService.countEmotions(userId));
+    public ResponseEntity<Map<String, Long>> emotionStats(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.countByEmotion(userId));
     }
 
     @GetMapping("/{userId}/genres")
-    public ResponseEntity<List<TopGenreResponse>> genreStats(@PathVariable Long userId) {
-        return ResponseEntity.ok(vibeStatsService.topGenres(userId));
+    public ResponseEntity<Map<String, Long>> genreStats(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.topGenres(userId));
     }
 
     @GetMapping("/{userId}/artists")
-    public ResponseEntity<List<TopArtistResponse>> artistStats(@PathVariable Long userId) {
-        return ResponseEntity.ok(vibeStatsService.topArtists(userId));
+    public ResponseEntity<Map<String, Long>> artistStats(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.topArtists(userId));
     }
 
     @GetMapping("/{userId}/timeline")
-    public ResponseEntity<List<TimelinePointResponse>> timeline(@PathVariable Long userId) {
-        return ResponseEntity.ok(vibeStatsService.timeline(userId));
+    public ResponseEntity<Map<String, Long>> timeline(@PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.timeline(userId));
     }
 }

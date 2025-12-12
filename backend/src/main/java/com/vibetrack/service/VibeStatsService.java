@@ -1,60 +1,32 @@
 package com.vibetrack.service;
 
-import com.vibetrack.dto.stats.EmotionCountResponse;
-import com.vibetrack.dto.stats.TopArtistResponse;
-import com.vibetrack.dto.stats.TopGenreResponse;
-import com.vibetrack.dto.stats.TimelinePointResponse;
-import com.vibetrack.repository.VibeStatsRepository;
+import com.vibetrack.entity.VibeEntry;
+import com.vibetrack.repository.VibeEntryRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class VibeStatsService {
 
-    private final VibeStatsRepository vibeStatsRepository;
+    private final VibeEntryRepository vibeEntryRepository;
 
-    public VibeStatsService(VibeStatsRepository vibeStatsRepository) {
-        this.vibeStatsRepository = vibeStatsRepository;
+    public VibeStatsService(VibeEntryRepository vibeEntryRepository) {
+        this.vibeEntryRepository = vibeEntryRepository;
     }
 
-    // Estatísticas por emoção
-    public List<EmotionCountResponse> countByEmotion(Long userId) {
-        return vibeStatsRepository.countByEmotion(userId)
-                .stream()
-                .map(row -> new EmotionCountResponse(
-                        (com.vibetrack.model.Emotion) row[0],
-                        ((Number) row[1]).longValue()
-                )).toList();
-    }
+    public Map<String, Long> countEmotions(Long userId) {
+        List<VibeEntry> entries = vibeEntryRepository.findByUserId(userId);
+        Map<String, Long> emotionCount = new HashMap<>();
 
-    // Top gêneros
-    public List<TopGenreResponse> topGeneros(Long userId) {
-        return vibeStatsRepository.topGeneros(userId)
-                .stream()
-                .map(row -> new TopGenreResponse(
-                        (String) row[0],
-                        ((Number) row[1]).longValue()
-                )).toList();
-    }
+        for (VibeEntry entry : entries) {
+            String emotionName = entry.getEmotion();
+            if (emotionName == null) continue;
+            emotionCount.merge(emotionName, 1L, Long::sum);
+        }
 
-    // Top artistas
-    public List<TopArtistResponse> topArtistas(Long userId) {
-        return vibeStatsRepository.topArtistas(userId)
-                .stream()
-                .map(row -> new TopArtistResponse(
-                        (String) row[0],
-                        ((Number) row[1]).longValue()
-                )).toList();
-    }
-
-    // Timeline diária
-    public List<TimelinePointResponse> timeline(Long userId) {
-        return vibeStatsRepository.timeline(userId)
-                .stream()
-                .map(row -> new TimelinePointResponse(
-                        row[0].toString(),
-                        ((Number) row[1]).longValue()
-                )).toList();
+        return emotionCount;
     }
 }

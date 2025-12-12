@@ -3,7 +3,7 @@ package com.vibetrack.controller;
 import com.vibetrack.dto.ApiResponse;
 import com.vibetrack.dto.VibeEntryRequest;
 import com.vibetrack.dto.VibeEntryResponse;
-import com.vibetrack.model.AppUser;
+import com.vibetrack.entity.User;
 import com.vibetrack.service.UserService;
 import com.vibetrack.service.VibeEntryService;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,17 @@ public class VibeEntryController {
         this.userService = userService;
     }
 
-    private AppUser getAuthenticatedUser() {
+    private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        return userService.findByEmail(email);
+
+        return userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<VibeEntryResponse>> create(@RequestBody VibeEntryRequest request) {
-        AppUser user = getAuthenticatedUser();
+        User user = getAuthenticatedUser();
         VibeEntryResponse response = vibeEntryService.create(request, user);
 
         return ResponseEntity.ok(
@@ -43,7 +45,7 @@ public class VibeEntryController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<List<VibeEntryResponse>>> listMyVibes() {
-        AppUser user = getAuthenticatedUser();
+        User user = getAuthenticatedUser();
         List<VibeEntryResponse> list = vibeEntryService.findAllByUser(user);
 
         return ResponseEntity.ok(
@@ -53,7 +55,7 @@ public class VibeEntryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        AppUser user = getAuthenticatedUser();
+        User user = getAuthenticatedUser();
         vibeEntryService.delete(id, user);
 
         return ResponseEntity.ok(
