@@ -2,9 +2,8 @@
 
 Aplicação full-stack para autoconhecimento musical: registre músicas + emoções e visualize padrões de humor, artistas, gêneros e hábitos de escuta ao longo do tempo.
 
-<p align="center">
-  <img src="docs/screenshots/login.png" alt="Vibetrack - Login" width="900" />
-</p>
+<img src="frontend/src/app/assets/img/dog-aesthetic.jpg" alt="Vibetrack - Login" width="900" />
+
 
 ## Sobre o projeto
 O Vibetrack nasceu como um projeto de portfólio para praticar arquitetura full-stack, autenticação com JWT e consumo de API com Angular.
