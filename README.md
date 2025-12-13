@@ -2,7 +2,7 @@
 
 Aplicação full-stack para autoconhecimento musical: registre músicas + emoções e visualize padrões de humor, artistas, gêneros e hábitos de escuta ao longo do tempo.
 
-<img src="frontend/src/app/assets/img/dog-aesthetic.jpg" alt="Vibetrack - Login" width="900" />
+<img src="frontend/src/app/assets/img/dog-aesthetic.jpg" alt="Vibetrack - Login" width="800" />
 
 
 ## Sobre o projeto
