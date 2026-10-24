@@ -1,4 +1,4 @@
-# Vibetrack (MVP finalizado)
+# Vibetrack (projeto de estudo)
 
 Aplicação full-stack para autoconhecimento musical: registre músicas + emoções e visualize padrões de humor, artistas, gêneros e hábitos de escuta ao longo do tempo.
 
@@ -6,10 +6,10 @@ Aplicação full-stack para autoconhecimento musical: registre músicas + emoç�
 
 
 ## Sobre o projeto
-O Vibetrack nasceu como um projeto de portfólio para praticar arquitetura full-stack, autenticação com JWT e consumo de API com Angular.
+O Vibetrack nasceu como um projeto de estudo para praticar arquitetura full-stack, autenticação com JWT e consumo de API com Angular.
 O foco foi entregar um MVP funcional — com decisões e concessões reais — e documentar o suficiente para qualquer pessoa conseguir rodar localmente.
 
-> Status: **MVP finalizado (portfólio)**.  
+> Status: **projeto de estudo, não mantido**.  
 > Roadmap permanece no fim do README para possíveis evoluções.
 
 ## Funcionalidades
